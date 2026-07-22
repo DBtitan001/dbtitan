@@ -37,6 +37,9 @@ public class SecurityConfig {
                         // Allow Auth endpoints
                         .requestMatchers("/api/auth/**").permitAll()
 
+                        // Allow AI Voice endpoint
+                        .requestMatchers("/api/ai/**").permitAll()
+
                         // Allow Swagger UI & OpenAPI endpoints
                         .requestMatchers(
                                 "/v3/api-docs/**",
@@ -49,6 +52,7 @@ public class SecurityConfig {
 
                         // Allow Actuator
                         .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/ai/**", "/api/dashboard/**").permitAll()
 
                         // Require authentication for all other endpoints
                         .anyRequest().authenticated()
