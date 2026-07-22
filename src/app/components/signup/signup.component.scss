@@ -1,0 +1,200 @@
+:host {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.login-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f5f6f8;
+}
+
+/* Left Brand Section */
+.brand-section {
+  width: 38%;
+  background-color: #031B4e;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 60px 40px 30px;
+  box-sizing: border-box;
+
+  .brand-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  .logo-shield {
+    width: 90px;
+    height: 90px;
+    margin-bottom: 24px;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .brand-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-subtitle {
+    font-size: 0.95rem;
+    color: #94a3b8;
+    margin: 0 0 6px 0;
+  }
+
+  .brand-highlight {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .copyright {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-align: left;
+  }
+}
+
+/* Right Form Section */
+.form-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+
+  .card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 40px 48px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0 0 6px 0;
+      text-align: center;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: #64748b;
+      margin: 0 0 28px 0;
+      text-align: center;
+    }
+  }
+}
+
+/* Form Controls */
+.form-group {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.875rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background-color: #fafafa;
+    color: #1e293b;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s, background-color 0.2s;
+
+    &::placeholder {
+      color: #cbd5e1;
+    }
+
+    &:focus {
+      border-color: #0066ff;
+      background-color: #ffffff;
+    }
+  }
+}
+
+.error-alert {
+  color: #dc2626;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Buttons */
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background-color: #0066ff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: #0052cc;
+  }
+
+  &:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+  }
+}
+
+.auth-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #64748b;
+
+  a {
+    color: #0066ff;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .login-wrapper {
+    flex-direction: column;
+  }
+  .brand-section {
+    width: 100%;
+    padding: 40px 20px;
+  }
+}

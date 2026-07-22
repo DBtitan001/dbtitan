@@ -1,0 +1,92 @@
+<div class="layout-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="shield-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <span>KYC CLM</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <i class="icon">📊</i> Dashboard
+      </a>
+      <a routerLink="/clients" routerLinkActive="active" class="nav-item">
+        <i class="icon">👥</i> Clients
+      </a>
+      <a routerLink="/onboarding" routerLinkActive="active" class="nav-item">
+        <i class="icon">🔄</i> Onboarding
+      </a>
+      <a routerLink="/kyc-review" routerLinkActive="active" class="nav-item">
+        <i class="icon">🛡️</i> KYC Review
+      </a>
+      <a routerLink="/alerts" routerLinkActive="active" class="nav-item">
+        <i class="icon">🔔</i> Alerts
+      </a>
+      <a class="nav-item"><i class="icon">📋</i> Tasks</a>
+      <a class="nav-item"><i class="icon">📁</i> Documents</a>
+      <a class="nav-item"><i class="icon">📈</i> Reports</a>
+      <a class="nav-item"><i class="icon">📄</i> Audit Trail</a>
+      <a class="nav-item"><i class="icon">🚪</i> Offboarding</a>
+      <a class="nav-item"><i class="icon">⚙️</i> Settings</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-container">
+      <div class="header-action-row">
+        <div>
+          <h2>Clients</h2>
+          <p class="breadcrumbs">
+            <a routerLink="/dashboard" class="home-link">Home</a> / Clients
+          </p>
+        </div>
+        <button class="btn-primary" routerLink="/onboarding">+ Add Client</button>
+      </div>
+
+      <div class="table-card">
+        <div class="filter-bar">
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            placeholder="Search by Client Name / ID / Type..."
+            class="search-input"
+          />
+          <button class="btn-secondary">⚙ Filters</button>
+        </div>
+
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th>Client ID</th>
+            <th>Client Name</th>
+            <th>Client Type</th>
+            <th>Risk Rating</th>
+            <th>Status</th>
+            <th>Onboarded On</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let client of filteredClients">
+            <td><strong>{{ client.id }}</strong></td>
+            <td>{{ client.name }}</td>
+            <td>{{ client.type }}</td>
+            <td>
+              <span class="badge risk" [ngClass]="client.riskRating.toLowerCase()">{{ client.riskRating }}</span>
+            </td>
+            <td>
+              <span class="badge status" [ngClass]="client.status.toLowerCase().replace(' ', '-')">{{ client.status }}</span>
+            </td>
+            <td>{{ client.onboardedOn }}</td>
+          </tr>
+          <tr *ngIf="filteredClients.length === 0">
+            <td colspan="6" class="no-results">No clients found matching "{{ searchQuery }}"</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,175 @@
+<div class="layout-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="shield-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <span>KYC CLM</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <i class="icon">📊</i> Dashboard
+      </a>
+      <a routerLink="/clients" routerLinkActive="active" class="nav-item">
+        <i class="icon">👥</i> Clients
+      </a>
+      <a routerLink="/onboarding" routerLinkActive="active" class="nav-item">
+        <i class="icon">🔄</i> Onboarding
+      </a>
+      <a routerLink="/kyc-review" routerLinkActive="active" class="nav-item">
+        <i class="icon">🛡️</i> KYC Review
+      </a>
+      <a routerLink="/alerts" routerLinkActive="active" class="nav-item">
+        <i class="icon">🔔</i> Alerts
+      </a>
+      <a class="nav-item"><i class="icon">📋</i> Tasks</a>
+      <a class="nav-item"><i class="icon">📁</i> Documents</a>
+      <a class="nav-item"><i class="icon">📈</i> Reports</a>
+      <a class="nav-item"><i class="icon">📄</i> Audit Trail</a>
+      <a class="nav-item"><i class="icon">🚪</i> Offboarding</a>
+      <a class="nav-item"><i class="icon">⚙️</i> Settings</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="top-header">
+      <div class="header-left">
+        <span class="menu-toggle">☰</span>
+        <h1>Dashboard</h1>
+      </div>
+
+      <div class="header-right">
+        <div class="search-box">
+          <span>🔍</span>
+        </div>
+        <div class="notification-badge">
+          <span>🔔</span>
+          <span class="count">1</span>
+        </div>
+        <div class="user-profile" (click)="logout()" title="Click to logout">
+          <div class="avatar">
+            <img src="https://ui-avatars.com/api/?name={{currentUser}}&background=2563eb&color=fff" alt="User">
+          </div>
+          <span class="username">{{ currentUser }} ▾</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard-body">
+
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <span class="title">Total Clients</span>
+          <div class="value">{{ totalClients }}</div>
+          <span class="subtext green">↑ 12.2% vs last month</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="title">Onboarding</span>
+          <div class="value">{{ onboardingCount }}</div>
+          <span class="subtext blue">● In Progress</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="title">KYC Review</span>
+          <div class="value">{{ kycReviewCount }}</div>
+          <span class="subtext yellow">◆ Pending Review</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="title">Alerts</span>
+          <div class="value">{{ alertsCount }}</div>
+          <span class="subtext red">🛑 Requires Attention</span>
+        </div>
+      </section>
+
+      <section class="overview-grid">
+
+        <div class="panel-card">
+          <h3>Client Lifecycle Overview</h3>
+          <div class="lifecycle-content">
+            <div class="chart-container">
+              <div class="donut-chart">
+                <div class="chart-center">
+                  <strong>12,458</strong>
+                  <span>Total</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-legend">
+              <div class="legend-item"><span class="dot blue"></span> Onboarding <strong>234 (18.8%)</strong></div>
+              <div class="legend-item"><span class="dot green"></span> Active <strong>10,234 (82.1%)</strong></div>
+              <div class="legend-item"><span class="dot yellow"></span> Review <strong>89 (7.1%)</strong></div>
+              <div class="legend-item"><span class="dot navy"></span> Offboarding <strong>156 (12.0%)</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <h3>Alerts Overview</h3>
+          <div class="alerts-list">
+            <div class="alert-row">
+              <div class="alert-info">
+                <span class="alert-icon red">⚠️</span>
+                <span>High Risk Clients</span>
+              </div>
+              <span class="alert-value">23</span>
+            </div>
+
+            <div class="alert-row">
+              <div class="alert-info">
+                <span class="alert-icon yellow">⚠️</span>
+                <span>KYC Overdue</span>
+              </div>
+              <span class="alert-value">18</span>
+            </div>
+
+            <div class="alert-row">
+              <div class="alert-info">
+                <span class="alert-icon blue">📁</span>
+                <span>Document Expiry</span>
+              </div>
+              <span class="alert-value">15</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-card recent-activities">
+        <h3>Recent Activities</h3>
+
+        <table class="activities-table">
+          <thead>
+          <tr>
+            <th>Activity</th>
+            <th>Activity Type</th>
+            <th>Status</th>
+            <th>Date & Time</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let item of activities">
+            <td class="client-cell">
+              <span class="file-icon">📄</span> {{ item.activity }}
+            </td>
+            <td>{{ item.type }}</td>
+            <td>
+                <span class="status-badge" [ngClass]="item.status.toLowerCase().replace(' ', '-')">
+                  {{ item.status }}
+                </span>
+            </td>
+            <td class="date-cell">{{ item.dateTime }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </section>
+
+    </div>
+  </main>
+</div>

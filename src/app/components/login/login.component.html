@@ -1,0 +1,126 @@
+<div class="auth-container">
+  <div class="brand-section">
+    <div class="brand-content">
+      <div class="brand-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <h1>KYC CLM Platform</h1>
+      <p class="subtitle">Client Lifecycle Management</p>
+      <div class="badge">Onboarding to Offboarding</div>
+    </div>
+    <div class="brand-footer">
+      &copy; 2026 DB Titan KYC CLM Platform. All rights reserved.
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="auth-card">
+
+      <div class="tab-header" *ngIf="!isForgotPasswordMode">
+        <button [class.active]="isLoginMode" (click)="toggleMode(true)">Sign In</button>
+        <button [class.active]="!isLoginMode" (click)="toggleMode(false)">Sign Up</button>
+      </div>
+
+      <div class="error-alert" *ngIf="errorMessage">
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <div class="success-alert" *ngIf="successMessage">
+        <span>{{ successMessage }}</span>
+      </div>
+
+      <form *ngIf="isLoginMode && !isForgotPasswordMode" [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+        <h2>Welcome Back!</h2>
+        <p class="form-desc">Sign in to access your KYC Workspace</p>
+
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <div class="input-wrapper">
+            <input id="login-username" type="text" formControlName="username" placeholder="Enter your username" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label for="login-password">Password</label>
+            <a href="#" class="forgot-link" (click)="openForgotPassword($event)">Forgot Password?</a>
+          </div>
+          <div class="input-wrapper">
+            <input id="login-password" type="password" formControlName="password" placeholder="Enter your password" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="loginForm.invalid || isLoading">
+          {{ isLoading ? 'Signing In...' : 'Sign In' }}
+        </button>
+
+        <div class="divider"><span>or</span></div>
+
+        <button type="button" class="btn-sso" (click)="onSSOLogin()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.31-2.555-.866-3.662A11.959 11.959 0 0112 2.714z" />
+          </svg>
+          Sign in with Corporate SSO
+        </button>
+      </form>
+
+      <form *ngIf="!isLoginMode && !isForgotPasswordMode" [formGroup]="signupForm" (ngSubmit)="onSignupSubmit()">
+        <h2>Create Account</h2>
+        <p class="form-desc">Register a new profile on DB Titan</p>
+
+        <div class="form-group">
+          <label for="signup-username">Username</label>
+          <div class="input-wrapper">
+            <input id="signup-username" type="text" formControlName="username" placeholder="Choose a username" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-email">Email Address</label>
+          <div class="input-wrapper">
+            <input id="signup-email" type="email" formControlName="email" placeholder="name@company.com" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <div class="input-wrapper">
+            <input id="signup-password" type="password" formControlName="password" placeholder="Create a strong password" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="signupForm.invalid || isLoading">
+          {{ isLoading ? 'Creating Account...' : 'Sign Up' }}
+        </button>
+      </form>
+
+      <form *ngIf="isForgotPasswordMode" [formGroup]="forgotPasswordForm" (ngSubmit)="onForgotPasswordSubmit()">
+        <h2>Reset Password</h2>
+        <p class="form-desc">Enter your account email to receive a password reset link.</p>
+
+        <div class="form-group">
+          <label for="forgot-email">Email Address</label>
+          <div class="input-wrapper">
+            <input id="forgot-email" type="email" formControlName="email" placeholder="name@company.com" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="forgotPasswordForm.invalid || isLoading">
+          {{ isLoading ? 'Sending Link...' : 'Send Reset Link' }}
+        </button>
+
+        <button type="button" class="btn-sso" style="margin-top: 0.75rem;" (click)="toggleMode(true)">
+          Back to Sign In
+        </button>
+      </form>
+
+      <div class="auth-footer" *ngIf="!isForgotPasswordMode">
+        <span *ngIf="isLoginMode">Don't have an account? <a (click)="toggleMode(false)">Sign up</a></span>
+        <span *ngIf="!isLoginMode">Already have an account? <a (click)="toggleMode(true)">Sign in</a></span>
+      </div>
+
+    </div>
+  </div>
+</div>
