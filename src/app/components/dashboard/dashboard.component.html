@@ -26,12 +26,24 @@
       <a routerLink="/alerts" routerLinkActive="active" class="nav-item">
         <i class="icon">🔔</i> Alerts
       </a>
-      <a class="nav-item"><i class="icon">📋</i> Tasks</a>
-      <a class="nav-item"><i class="icon">📁</i> Documents</a>
-      <a class="nav-item"><i class="icon">📈</i> Reports</a>
-      <a class="nav-item"><i class="icon">📄</i> Audit Trail</a>
-      <a class="nav-item"><i class="icon">🚪</i> Offboarding</a>
-      <a class="nav-item"><i class="icon">⚙️</i> Settings</a>
+      <a routerLink="/tasks" routerLinkActive="active" class="nav-item">
+        <i class="icon">📋</i> Tasks
+      </a>
+      <a routerLink="/documents" routerLinkActive="active" class="nav-item">
+        <i class="icon">📁</i> Documents
+      </a>
+      <a routerLink="/reports" routerLinkActive="active" class="nav-item">
+        <i class="icon">📈</i> Reports
+      </a>
+      <a routerLink="/audit-trail" routerLinkActive="active" class="nav-item">
+        <i class="icon">📄</i> Audit Trail
+      </a>
+      <a routerLink="/offboarding" routerLinkActive="active" class="nav-item">
+        <i class="icon">🚪</i> Offboarding
+      </a>
+      <a routerLink="/settings" routerLinkActive="active" class="nav-item">
+        <i class="icon">⚙️</i> Settings
+      </a>
     </nav>
   </aside>
 
@@ -44,19 +56,77 @@
       </div>
 
       <div class="header-right">
-        <div class="search-box">
-          <span>🔍</span>
-        </div>
-        <div class="notification-badge">
-          <span>🔔</span>
-          <span class="count">1</span>
-        </div>
-        <div class="user-profile" (click)="logout()" title="Click to logout">
-          <div class="avatar">
-            <img src="https://ui-avatars.com/api/?name={{currentUser}}&background=2563eb&color=fff" alt="User">
+        <button
+          class="ai-voice-btn"
+          [class.is-listening]="voiceService.isListening"
+          (click)="voiceService.startListening()"
+          title="Ask AI (Speech to Text)">
+          <svg *ngIf="!voiceService.isListening" class="mic-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+          <div class="listening-waves" *ngIf="voiceService.isListening">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
           </div>
-          <span class="username">{{ currentUser }} ▾</span>
+        </button>
+
+        <div class="search-box-wrapper" [class.open]="isSearchOpen">
+          <input
+            *ngIf="isSearchOpen"
+            type="text"
+            [(ngModel)]="topSearchQuery"
+            (keyup.enter)="onGlobalSearch()"
+            placeholder="Search clients, KYC, docs..."
+            class="top-search-input"
+          />
+          <span class="search-btn" (click)="toggleSearch()" title="Search">🔍</span>
         </div>
+
+        <div class="notification-wrapper">
+          <div class="notification-badge" (click)="toggleNotifications()" title="Notifications">
+            <span>🔔</span>
+            <span class="count" *ngIf="notifications.length > 0">2</span>
+          </div>
+
+          <div class="dropdown-popover notifications-popover" *ngIf="isNotificationOpen">
+            <div class="popover-header">
+              <strong>Notifications</strong>
+              <button (click)="markAllNotificationsRead()">Mark all as read</button>
+            </div>
+            <div class="popover-body">
+              <div class="notification-item" *ngFor="let item of notifications" [class.unread]="item.unread">
+                <strong>{{ item.title }}</strong>
+                <p>{{ item.message }}</p>
+                <small>{{ item.time }}</small>
+              </div>
+            </div>
+            <div class="popover-footer" routerLink="/alerts" (click)="isNotificationOpen = false">
+              View All Alerts →
+            </div>
+          </div>
+        </div>
+
+        <div class="user-profile-wrapper">
+          <div class="user-profile" (click)="toggleProfileMenu()">
+            <div class="avatar">
+              <img src="https://ui-avatars.com/api/?name={{currentUser}}&background=2563eb&color=fff" alt="User">
+            </div>
+            <span class="username">{{ currentUser }} ▾</span>
+          </div>
+
+          <div class="dropdown-popover profile-popover" *ngIf="isProfileMenuOpen">
+            <div class="profile-info">
+              <strong>{{ currentUser }}</strong>
+              <small>System Administrator</small>
+            </div>
+            <hr />
+            <a routerLink="/settings" (click)="isProfileMenuOpen = false" class="popover-link">⚙️ Settings</a>
+            <a (click)="logout()" class="popover-link danger">🚪 Logout</a>
+          </div>
+        </div>
+
       </div>
     </header>
 
@@ -96,16 +166,16 @@
             <div class="chart-container">
               <div class="donut-chart">
                 <div class="chart-center">
-                  <strong>12,458</strong>
+                  <strong>{{ totalClients }}</strong>
                   <span>Total</span>
                 </div>
               </div>
             </div>
 
             <div class="chart-legend">
-              <div class="legend-item"><span class="dot blue"></span> Onboarding <strong>234 (18.8%)</strong></div>
+              <div class="legend-item"><span class="dot blue"></span> Onboarding <strong>{{ onboardingCount }}</strong></div>
               <div class="legend-item"><span class="dot green"></span> Active <strong>10,234 (82.1%)</strong></div>
-              <div class="legend-item"><span class="dot yellow"></span> Review <strong>89 (7.1%)</strong></div>
+              <div class="legend-item"><span class="dot yellow"></span> Review <strong>{{ kycReviewCount }}</strong></div>
               <div class="legend-item"><span class="dot navy"></span> Offboarding <strong>156 (12.0%)</strong></div>
             </div>
           </div>
@@ -119,7 +189,7 @@
                 <span class="alert-icon red">⚠️</span>
                 <span>High Risk Clients</span>
               </div>
-              <span class="alert-value">23</span>
+              <span class="alert-value">{{ highRiskClients }}</span>
             </div>
 
             <div class="alert-row">
@@ -127,7 +197,7 @@
                 <span class="alert-icon yellow">⚠️</span>
                 <span>KYC Overdue</span>
               </div>
-              <span class="alert-value">18</span>
+              <span class="alert-value">{{ kycOverdue }}</span>
             </div>
 
             <div class="alert-row">
@@ -135,7 +205,7 @@
                 <span class="alert-icon blue">📁</span>
                 <span>Document Expiry</span>
               </div>
-              <span class="alert-value">15</span>
+              <span class="alert-value">{{ documentExpiry }}</span>
             </div>
           </div>
         </div>

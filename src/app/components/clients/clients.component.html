@@ -1,4 +1,5 @@
 <div class="layout-wrapper">
+
   <aside class="sidebar">
     <div class="sidebar-brand">
       <div class="shield-icon">
@@ -25,12 +26,24 @@
       <a routerLink="/alerts" routerLinkActive="active" class="nav-item">
         <i class="icon">🔔</i> Alerts
       </a>
-      <a class="nav-item"><i class="icon">📋</i> Tasks</a>
-      <a class="nav-item"><i class="icon">📁</i> Documents</a>
-      <a class="nav-item"><i class="icon">📈</i> Reports</a>
-      <a class="nav-item"><i class="icon">📄</i> Audit Trail</a>
-      <a class="nav-item"><i class="icon">🚪</i> Offboarding</a>
-      <a class="nav-item"><i class="icon">⚙️</i> Settings</a>
+      <a routerLink="/tasks" routerLinkActive="active" class="nav-item">
+        <i class="icon">📋</i> Tasks
+      </a>
+      <a routerLink="/documents" routerLinkActive="active" class="nav-item">
+        <i class="icon">📁</i> Documents
+      </a>
+      <a routerLink="/reports" routerLinkActive="active" class="nav-item">
+        <i class="icon">📈</i> Reports
+      </a>
+      <a routerLink="/audit-trail" routerLinkActive="active" class="nav-item">
+        <i class="icon">📄</i> Audit Trail
+      </a>
+      <a routerLink="/offboarding" routerLinkActive="active" class="nav-item">
+        <i class="icon">🚪</i> Offboarding
+      </a>
+      <a routerLink="/settings" routerLinkActive="active" class="nav-item">
+        <i class="icon">⚙️</i> Settings
+      </a>
     </nav>
   </aside>
 
@@ -70,9 +83,9 @@
           </thead>
           <tbody>
           <tr *ngFor="let client of filteredClients">
-            <td><strong>{{ client.id }}</strong></td>
-            <td>{{ client.name }}</td>
-            <td>{{ client.type }}</td>
+            <td><strong>{{ client.clientId }}</strong></td>
+            <td>{{ client.clientName }}</td>
+            <td>{{ client.clientType }}</td>
             <td>
               <span class="badge risk" [ngClass]="client.riskRating.toLowerCase()">{{ client.riskRating }}</span>
             </td>

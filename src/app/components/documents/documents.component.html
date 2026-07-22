@@ -1,0 +1,270 @@
+<div class="layout-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="shield-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <span>KYC CLM</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <i class="icon">📊</i> Dashboard
+      </a>
+      <a routerLink="/clients" routerLinkActive="active" class="nav-item">
+        <i class="icon">👥</i> Clients
+      </a>
+      <a routerLink="/onboarding" routerLinkActive="active" class="nav-item">
+        <i class="icon">🔄</i> Onboarding
+      </a>
+      <a routerLink="/kyc-review" routerLinkActive="active" class="nav-item">
+        <i class="icon">🛡️</i> KYC Review
+      </a>
+      <a routerLink="/alerts" routerLinkActive="active" class="nav-item">
+        <i class="icon">🔔</i> Alerts
+      </a>
+      <a routerLink="/tasks" routerLinkActive="active" class="nav-item">
+        <i class="icon">📋</i> Tasks
+      </a>
+      <a routerLink="/documents" routerLinkActive="active" class="nav-item">
+        <i class="icon">📁</i> Documents
+      </a>
+      <a routerLink="/reports" routerLinkActive="active" class="nav-item">
+        <i class="icon">📈</i> Reports
+      </a>
+      <a routerLink="/audit-trail" routerLinkActive="active" class="nav-item">
+        <i class="icon">📄</i> Audit Trail
+      </a>
+      <a routerLink="/offboarding" routerLinkActive="active" class="nav-item">
+        <i class="icon">🚪</i> Offboarding
+      </a>
+      <a routerLink="/settings" routerLinkActive="active" class="nav-item">
+        <i class="icon">⚙️</i> Settings
+      </a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="top-header">
+      <div class="header-left">
+        <span class="menu-toggle">☰</span>
+        <h1>Documents Repository</h1>
+      </div>
+
+      <div class="header-right">
+        <button
+          class="ai-voice-btn"
+          [class.is-listening]="voiceService.isListening"
+          (click)="voiceService.startListening()"
+          title="Ask AI (Speech to Text)">
+
+          <svg *ngIf="!voiceService.isListening" class="mic-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+
+          <div class="listening-waves" *ngIf="voiceService.isListening">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </div>
+        </button>
+
+        <div class="search-box">
+          <span>🔍</span>
+        </div>
+
+        <div class="notification-badge">
+          <span>🔔</span>
+          <span class="count">1</span>
+        </div>
+
+        <div class="user-profile" (click)="logout()" title="Click to logout">
+          <div class="avatar">
+            <img src="https://ui-avatars.com/api/?name={{currentUser}}&background=2563eb&color=fff" alt="User">
+          </div>
+          <span class="username">{{ currentUser }} ▾</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard-body">
+
+      <div class="header-action-row">
+        <h2>Documents Management</h2>
+        <button class="btn-primary" (click)="openUploadModal()">📤 Upload Document</button>
+      </div>
+
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <span class="title">Total Documents</span>
+          <div class="value">{{ documents.length }}</div>
+          <span class="subtext blue">Stored across repository</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="title">Verified Active</span>
+          <div class="value">4</div>
+          <span class="subtext green">✓ Compliance Approved</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="title">Pending Review</span>
+          <div class="value">1</div>
+          <span class="subtext yellow">◆ Pending Review</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="title">Expiring Soon</span>
+          <div class="value">1</div>
+          <span class="subtext red">🛑 Requires Attention</span>
+        </div>
+      </section>
+
+      <section class="panel-card">
+        <div class="filter-bar">
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            placeholder="Search by Document Name, Client, or ID..."
+            class="search-input"
+          />
+
+          <div class="dropdown-group">
+            <select [(ngModel)]="selectedCategory" class="filter-select">
+              <option value="All">All Categories</option>
+              <option value="Legal Document">Legal Document</option>
+              <option value="Tax Document">Tax Document</option>
+              <option value="Address Proof">Address Proof</option>
+              <option value="Financial Document">Financial Document</option>
+            </select>
+
+            <select [(ngModel)]="selectedStatus" class="filter-select">
+              <option value="All">All Statuses</option>
+              <option value="Active">Active</option>
+              <option value="Pending">Pending</option>
+              <option value="Expired">Expired</option>
+            </select>
+          </div>
+        </div>
+
+        <table class="activities-table">
+          <thead>
+          <tr>
+            <th>Document Name</th>
+            <th>Client Name</th>
+            <th>Type</th>
+            <th>Uploaded On</th>
+            <th>Expiry Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let doc of filteredDocuments">
+            <td class="client-cell">
+              <span class="file-icon">📄</span> {{ doc.name }}
+              <span class="doc-id">({{ doc.id }})</span>
+            </td>
+            <td><strong>{{ doc.clientName }}</strong></td>
+            <td>{{ doc.category }}</td>
+            <td class="date-cell">{{ doc.uploadedOn }}</td>
+            <td class="date-cell">{{ doc.expiryDate }}</td>
+            <td>
+                <span class="status-badge" [ngClass]="doc.status.toLowerCase()">
+                  {{ doc.status }}
+                </span>
+            </td>
+            <td>
+              <button class="btn-action" (click)="viewDocument(doc)">👁 View</button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredDocuments.length === 0">
+            <td colspan="7" style="text-align: center; color: #64748b; padding: 2rem 0;">No matching documents found.</td>
+          </tr>
+          </tbody>
+        </table>
+      </section>
+
+    </div>
+  </main>
+
+  <div class="modal-backdrop" *ngIf="isUploadModalOpen" (click)="closeUploadModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Upload Document</h3>
+        <button class="close-btn" (click)="closeUploadModal()">✕</button>
+      </div>
+
+      <form [formGroup]="uploadForm" (ngSubmit)="onUploadSubmit()">
+        <div class="form-group">
+          <label>Client Name</label>
+          <input type="text" formControlName="clientName" placeholder="e.g. ABC Corporation" />
+        </div>
+
+        <div class="form-group">
+          <label>Document Category</label>
+          <select formControlName="docType">
+            <option value="Legal Document">Legal Document</option>
+            <option value="Tax Document">Tax Document</option>
+            <option value="Address Proof">Address Proof</option>
+            <option value="Financial Document">Financial Document</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Document Title</label>
+          <input type="text" formControlName="docName" placeholder="e.g. Certificate of Incorporation" />
+        </div>
+
+        <div class="form-group">
+          <label>Expiry Date (Optional)</label>
+          <input type="date" formControlName="expiryDate" />
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeUploadModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="uploadForm.invalid">Upload</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="isViewModalOpen" (click)="closeViewModal()">
+    <div class="modal-card view-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📄 {{ selectedDoc?.name }}</h3>
+        <button class="close-btn" (click)="closeViewModal()">✕</button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedDoc">
+        <div class="doc-detail-grid">
+          <div><strong>Document ID:</strong> <span>{{ selectedDoc.id }}</span></div>
+          <div><strong>Client Name:</strong> <span>{{ selectedDoc.clientName }}</span></div>
+          <div><strong>Category:</strong> <span>{{ selectedDoc.category }}</span></div>
+          <div><strong>Uploaded On:</strong> <span>{{ selectedDoc.uploadedOn }}</span></div>
+          <div><strong>Expiry Date:</strong> <span>{{ selectedDoc.expiryDate }}</span></div>
+          <div><strong>Status:</strong> <span class="status-badge" [ngClass]="selectedDoc.status.toLowerCase()">{{ selectedDoc.status }}</span></div>
+        </div>
+
+        <div class="preview-box">
+          <div class="pdf-placeholder">
+            <span class="file-icon-large">📄</span>
+            <p>Document Preview Mode</p>
+            <small>{{ selectedDoc.name }} (PDF File)</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeViewModal()">Close</button>
+        <button class="btn-primary" (click)="downloadDocument()">⬇ Download Document</button>
+      </div>
+    </div>
+  </div>
+
+</div>

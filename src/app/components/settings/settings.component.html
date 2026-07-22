@@ -1,0 +1,186 @@
+<div class="layout-wrapper" (click)="closeAllMenus()">
+
+  <aside class="sidebar" (click)="$event.stopPropagation()">
+    <div class="sidebar-brand">
+      <div class="shield-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <span>KYC CLM</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item"><i class="icon">📊</i> Dashboard</a>
+      <a routerLink="/clients" routerLinkActive="active" class="nav-item"><i class="icon">👥</i> Clients</a>
+      <a routerLink="/onboarding" routerLinkActive="active" class="nav-item"><i class="icon">🔄</i> Onboarding</a>
+      <a routerLink="/kyc-review" routerLinkActive="active" class="nav-item"><i class="icon">🛡️</i> KYC Review</a>
+      <a routerLink="/alerts" routerLinkActive="active" class="nav-item"><i class="icon">🔔</i> Alerts</a>
+      <a routerLink="/tasks" routerLinkActive="active" class="nav-item"><i class="icon">📋</i> Tasks</a>
+      <a routerLink="/documents" routerLinkActive="active" class="nav-item"><i class="icon">📁</i> Documents</a>
+      <a routerLink="/reports" routerLinkActive="active" class="nav-item"><i class="icon">📈</i> Reports</a>
+      <a routerLink="/audit-trail" routerLinkActive="active" class="nav-item"><i class="icon">📄</i> Audit Trail</a>
+      <a routerLink="/offboarding" routerLinkActive="active" class="nav-item"><i class="icon">🚪</i> Offboarding</a>
+      <a routerLink="/settings" routerLinkActive="active" class="nav-item"><i class="icon">⚙️</i> Settings</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="top-header" (click)="$event.stopPropagation()">
+      <div class="header-left">
+        <span class="menu-toggle">☰</span>
+        <h1>System Settings</h1>
+      </div>
+
+      <div class="header-right">
+        <button
+          class="ai-voice-btn"
+          [class.is-listening]="voiceService.isListening"
+          (click)="voiceService.startListening()"
+          title="Ask AI">
+          <svg *ngIf="!voiceService.isListening" class="mic-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+        </button>
+
+        <div class="user-profile-wrapper">
+          <div class="user-profile" (click)="toggleProfileMenu($event)" title="Account Options">
+            <div class="avatar">
+              <img src="https://ui-avatars.com/api/?name={{currentUser}}&background=2563eb&color=fff" alt="User">
+            </div>
+            <span class="username">{{ currentUser }} ▾</span>
+          </div>
+
+          <div class="dropdown-popover profile-popover" *ngIf="isProfileMenuOpen" (click)="$event.stopPropagation()">
+            <div class="profile-info">
+              <strong>{{ currentUser }}</strong>
+              <small>System Administrator</small>
+            </div>
+            <hr />
+            <a routerLink="/settings" (click)="closeAllMenus()" class="popover-link">⚙️ Settings</a>
+            <a (click)="logout($event)" class="popover-link danger">🚪 Logout</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard-body">
+
+      <div class="header-action-row">
+        <h2>Account & Platform Preferences</h2>
+        <span class="success-banner" *ngIf="saveSuccessMessage">✓ {{ saveSuccessMessage }}</span>
+      </div>
+
+      <div class="settings-card">
+        <div class="tab-nav">
+          <button class="tab-btn" [class.active]="activeTab === 'profile'" (click)="setTab('profile')">👤 Profile Settings</button>
+          <button class="tab-btn" [class.active]="activeTab === 'security'" (click)="setTab('security')">🔒 Security & Password</button>
+          <button class="tab-btn" [class.active]="activeTab === 'notifications'" (click)="setTab('notifications')">🔔 Notifications</button>
+          <button class="tab-btn" [class.active]="activeTab === 'system'" (click)="setTab('system')">⚙️ System Configuration</button>
+        </div>
+
+        <div class="tab-content">
+          <div *ngIf="activeTab === 'profile'">
+            <form [formGroup]="profileForm" (ngSubmit)="saveSettings()">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Full Name</label>
+                  <input type="text" formControlName="fullName" />
+                </div>
+                <div class="form-group">
+                  <label>Email Address</label>
+                  <input type="email" formControlName="email" />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Role</label>
+                  <input type="text" formControlName="role" readonly class="readonly" />
+                </div>
+                <div class="form-group">
+                  <label>Department</label>
+                  <input type="text" formControlName="department" />
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-primary" [disabled]="profileForm.invalid">Save Changes</button>
+              </div>
+            </form>
+          </div>
+
+          <div *ngIf="activeTab === 'security'">
+            <form [formGroup]="securityForm" (ngSubmit)="saveSettings()">
+              <div class="form-group">
+                <label>Current Password</label>
+                <input type="password" formControlName="currentPassword" placeholder="••••••••" />
+              </div>
+
+              <div class="form-group">
+                <label>New Password</label>
+                <input type="password" formControlName="newPassword" placeholder="Minimum 8 characters" />
+              </div>
+
+              <div class="checkbox-group">
+                <label class="switch-label">
+                  <input type="checkbox" formControlName="twoFactorAuth" />
+                  <span>Enable Two-Factor Authentication (2FA)</span>
+                </label>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-primary" [disabled]="securityForm.invalid">Update Security</button>
+              </div>
+            </form>
+          </div>
+
+          <div *ngIf="activeTab === 'notifications'">
+            <form [formGroup]="notificationForm" (ngSubmit)="saveSettings()">
+              <div class="checkbox-list">
+                <label class="checkbox-item">
+                  <input type="checkbox" formControlName="emailAlerts" />
+                  <div>
+                    <strong>Email Notifications</strong>
+                    <p>Receive email updates for pending KYC actions and user alerts.</p>
+                  </div>
+                </label>
+
+                <label class="checkbox-item">
+                  <input type="checkbox" formControlName="highRiskNotifications" />
+                  <div>
+                    <strong>High Risk Client Alerts</strong>
+                    <p>Get instant notifications when a high-risk entity is onboarded.</p>
+                  </div>
+                </label>
+
+                <label class="checkbox-item">
+                  <input type="checkbox" formControlName="expiryReminders" />
+                  <div>
+                    <strong>Document Expiry Warnings</strong>
+                    <p>Receive reminders 30 days prior to legal document expiration.</p>
+                  </div>
+                </label>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">Save Preferences</button>
+              </div>
+            </form>
+          </div>
+
+          <div *ngIf="activeTab === 'system'">
+            <div class="system-info-grid">
+              <div><strong>Application Version:</strong> <span>v2.4.0-RELEASE</span></div>
+              <div><strong>Environment:</strong> <span>Production (Spring Boot + Angular)</span></div>
+              <div><strong>Database:</strong> <span>PostgreSQL 15</span></div>
+              <div><strong>AI Speech Engine:</strong> <span>Web Speech API & Gemini Engine</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
