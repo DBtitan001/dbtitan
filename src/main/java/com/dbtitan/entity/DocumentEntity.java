@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -23,26 +25,36 @@ public class DocumentEntity {
     @Column(name = "document_id", nullable = false, unique = true)
     private String documentId;
 
-    @Column(name = "client_id", nullable = false)
-    private String clientId;
-
-    @Column(name = "client_name")
-    private String clientName;
+    // --- ADD referencedColumnName = "client_id" HERE ---
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "client_id", referencedColumnName = "client_id", nullable = false)
+    private ClientEntity client;
 
     @Column(name = "document_name", nullable = false)
     private String documentName;
 
     @Column(name = "document_type")
-    private String documentType; // e.g., 'Legal Document', 'Tax Document'
+    private String documentType;
 
     @Column(name = "status")
-    private String status; // e.g., 'Verified', 'Pending', 'Active'
+    private String status;
 
     @Column(name = "uploaded_on")
     private String uploadedOn;
 
     @Column(name = "expiry_date")
     private String expiryDate;
+
+    @Column(name = "file_name")
+    private String fileName;
+
+    @Column(name = "file_type")
+    private String fileType;
+
+    @Lob
+    @JdbcTypeCode(SqlTypes.BINARY)
+    @Column(name = "file_data")
+    private byte[] fileData;
 
     @Builder.Default
     @Column(name = "created_at")

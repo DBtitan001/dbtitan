@@ -1,5 +1,6 @@
 package com.dbtitan.repository;
 
+import com.dbtitan.entity.ClientEntity;
 import com.dbtitan.entity.DocumentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -10,12 +11,18 @@ import java.util.Optional;
 @Repository
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> {
 
-    // Fetch all documents belonging to a specific Client ID
-    List<DocumentEntity> findByClientId(String clientId);
-
-    // Find a document by its unique Document ID (e.g., "DOC001")
+    // Find document by unique business ID (e.g. DOC-1001)
     Optional<DocumentEntity> findByDocumentId(String documentId);
 
-    // Count active or verified documents for a given client
-    long countByClientIdAndStatus(String clientId, String status);
+    // Find all documents belonging to a Client entity
+    List<DocumentEntity> findByClient(ClientEntity client);
+
+    // Find all documents by client's business ID (e.g. C0001)
+    List<DocumentEntity> findByClient_ClientId(String clientId);
+
+    // Exact match by client's name through relationship
+    List<DocumentEntity> findByClient_ClientName(String clientName);
+
+    // Case-insensitive partial match by client's name (e.g. "ABC" matches "ABC Corporation")
+    List<DocumentEntity> findByClient_ClientNameContainingIgnoreCase(String clientName);
 }

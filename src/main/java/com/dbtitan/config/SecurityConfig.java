@@ -49,9 +49,12 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**"
                         ).permitAll()
-
+                        .requestMatchers("/api/documents/**").permitAll()
                         // Allow Actuator
+                        .requestMatchers("/api/clients/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/api/ai/**").permitAll()
+                        .requestMatchers("/api/ai/**").permitAll()
                         .requestMatchers("/api/auth/**", "/api/ai/**", "/api/dashboard/**").permitAll()
 
                         // Require authentication for all other endpoints

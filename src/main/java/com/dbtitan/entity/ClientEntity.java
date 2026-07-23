@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "clients")
 @Data
@@ -32,4 +34,11 @@ public class ClientEntity {
 
     @Column(name = "status")
     private String status; // 'Active', 'KYC Review', 'Onboarding'
+
+    @Column(name = "onboarded_on")
+    private String onboardedOn;
+
+    @Builder.Default
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 }
