@@ -1,0 +1,203 @@
+<div class="layout-wrapper" (click)="closeAllMenus()">
+
+  <aside class="sidebar" (click)="$event.stopPropagation()">
+    <div class="sidebar-brand">
+      <div class="shield-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <span>KYC CLM</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item"><i class="icon">📊</i> Dashboard</a>
+      <a routerLink="/clients" routerLinkActive="active" class="nav-item"><i class="icon">👥</i> Clients</a>
+      <a routerLink="/onboarding" routerLinkActive="active" class="nav-item"><i class="icon">🔄</i> Onboarding</a>
+      <a routerLink="/kyc-review" routerLinkActive="active" class="nav-item"><i class="icon">🛡️</i> KYC Review</a>
+      <a routerLink="/alerts" routerLinkActive="active" class="nav-item"><i class="icon">🔔</i> Alerts</a>
+      <a routerLink="/tasks" routerLinkActive="active" class="nav-item"><i class="icon">📋</i> Tasks</a>
+      <a routerLink="/documents" routerLinkActive="active" class="nav-item"><i class="icon">📁</i> Documents</a>
+      <a routerLink="/reports" routerLinkActive="active" class="nav-item"><i class="icon">📈</i> Reports</a>
+      <a routerLink="/audit-trail" routerLinkActive="active" class="nav-item"><i class="icon">📄</i> Audit Trail</a>
+      <a routerLink="/offboarding" routerLinkActive="active" class="nav-item"><i class="icon">🚪</i> Offboarding</a>
+      <a routerLink="/settings" routerLinkActive="active" class="nav-item"><i class="icon">⚙️</i> Settings</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="top-header" (click)="$event.stopPropagation()">
+      <div class="header-left">
+        <span class="menu-toggle">☰</span>
+        <h1>Tasks Management</h1>
+      </div>
+
+      <div class="header-right">
+        <button class="ai-voice-btn" [class.is-listening]="voiceService.isListening" (click)="voiceService.startListening()" title="Ask AI">
+          <svg *ngIf="!voiceService.isListening" class="mic-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+        </button>
+
+        <div class="user-profile-wrapper">
+          <div class="user-profile" (click)="toggleProfileMenu($event)">
+            <div class="avatar">
+              <img src="https://ui-avatars.com/api/?name={{currentUser}}&background=2563eb&color=fff" alt="User">
+            </div>
+            <span class="username">{{ currentUser }} ▾</span>
+          </div>
+
+          <div class="dropdown-popover profile-popover" *ngIf="isProfileMenuOpen" (click)="$event.stopPropagation()">
+            <div class="profile-info">
+              <strong>{{ currentUser }}</strong>
+              <small>System Administrator</small>
+            </div>
+            <hr />
+            <a routerLink="/settings" (click)="closeAllMenus()" class="popover-link">⚙️ Settings</a>
+            <a (click)="logout($event)" class="popover-link danger">🚪 Logout</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard-body">
+
+      <div class="header-action-row">
+        <h2>Compliance Action Tasks</h2>
+        <button class="btn-primary" (click)="openCreateModal()">➕ Create New Task</button>
+      </div>
+
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <span class="title">Total Active Tasks</span>
+          <div class="value">{{ tasks.length }}</div>
+          <span class="subtext blue">Assigned across team</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="title">High Priority</span>
+          <div class="value">2</div>
+          <span class="subtext red">🛑 Action Required</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="title">In Progress</span>
+          <div class="value">1</div>
+          <span class="subtext yellow">◆ Ongoing Review</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="title">Completed Tasks</span>
+          <div class="value">1</div>
+          <span class="subtext green">✓ Resolved Today</span>
+        </div>
+      </section>
+
+      <section class="panel-card">
+        <div class="filter-bar">
+          <input type="text" [(ngModel)]="searchQuery" placeholder="Search task title, client, or ID..." class="search-input" />
+
+          <div class="dropdown-group">
+            <select [(ngModel)]="selectedPriority" class="filter-select">
+              <option value="All">All Priorities</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+
+            <select [(ngModel)]="selectedStatus" class="filter-select">
+              <option value="All">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+        </div>
+
+        <table class="activities-table">
+          <thead>
+          <tr>
+            <th>Task ID</th>
+            <th>Task Title</th>
+            <th>Client Name</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+            <th>Priority</th>
+            <th>Status</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let task of filteredTasks">
+            <td><strong>{{ task.id }}</strong></td>
+            <td>{{ task.title }}</td>
+            <td>{{ task.clientName }}</td>
+            <td>{{ task.assignedTo }}</td>
+            <td class="date-cell">{{ task.dueDate }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="task.priority.toLowerCase()">{{ task.priority }}</span>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="task.status.toLowerCase().replace(' ', '-')">{{ task.status }}</span>
+            </td>
+          </tr>
+          <tr *ngIf="filteredTasks.length === 0">
+            <td colspan="7" style="text-align: center; color: #64748b; padding: 2rem 0;">No tasks found matching your filters.</td>
+          </tr>
+          </tbody>
+        </table>
+      </section>
+
+    </div>
+  </main>
+
+  <div class="modal-backdrop" *ngIf="isCreateModalOpen" (click)="closeCreateModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Create Compliance Task</h3>
+        <button class="close-btn" (click)="closeCreateModal()">✕</button>
+      </div>
+
+      <form [formGroup]="taskForm" (ngSubmit)="onCreateSubmit()">
+        <div class="form-group">
+          <label>Task Title</label>
+          <input type="text" formControlName="title" placeholder="e.g. Verify UBO Documentation" />
+        </div>
+
+        <div class="form-group">
+          <label>Client Name</label>
+          <input type="text" formControlName="clientName" placeholder="e.g. ABC Corporation" />
+        </div>
+
+        <div class="form-group">
+          <label>Assigned To</label>
+          <select formControlName="assignedTo">
+            <option value="John Analyst">John Analyst</option>
+            <option value="Compliance Officer">Compliance Officer</option>
+            <option value="Risk Manager">Risk Manager</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" formControlName="dueDate" />
+        </div>
+
+        <div class="form-group">
+          <label>Priority Level</label>
+          <select formControlName="priority">
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeCreateModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="taskForm.invalid">Create Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
