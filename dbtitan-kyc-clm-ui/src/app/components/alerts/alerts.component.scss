@@ -1,0 +1,33 @@
+$sidebar-bg: #031530;
+$sidebar-active: #1d4ed8;
+
+.layout-wrapper { display: flex; min-height: 100vh; background-color: #f8fafc; }
+
+.sidebar {
+  width: 230px; background: $sidebar-bg; color: #fff; display: flex; flex-direction: column; flex-shrink: 0;
+  .sidebar-brand { display: flex; align-items: center; gap: 0.75rem; padding: 1.25rem 1.5rem; font-size: 1.25rem; font-weight: 700; .shield-icon svg { width: 28px; height: 28px; fill: #38bdf8; } }
+  .sidebar-nav { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.5rem;
+    .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1rem; color: #94a3b8; font-size: 0.9rem; border-radius: 8px; cursor: pointer; text-decoration: none;
+      &:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
+      &.active { background-color: $sidebar-active; color: #fff; font-weight: 600; }
+    }
+  }
+}
+
+.main-content { flex: 1; padding: 1.75rem; }
+
+h2 { margin: 0; font-size: 1.35rem; color: #0f172a; }
+.breadcrumbs { color: #64748b; font-size: 0.825rem; margin-top: 0.25rem; .home-link { color: #2563eb; text-decoration: none; font-weight: 500; &:hover { text-decoration: underline; } } }
+
+.tab-bar { display: flex; gap: 0.5rem; border-bottom: 1px solid #e2e8f0; margin: 1.25rem 0 1rem;
+  button { padding: 0.75rem 1.25rem; border: none; background: transparent; font-size: 0.9rem; font-weight: 600; color: #64748b; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid transparent;
+    &.active { color: #2563eb; border-bottom-color: #2563eb; }
+    .tab-badge { background: #e2e8f0; color: #334155; font-size: 0.75rem; padding: 2px 7px; border-radius: 999px; &.red { background: #fee2e2; color: #dc2626; } &.yellow { background: #fef3c7; color: #d97706; } &.blue { background: #dbeafe; color: #2563eb; } }
+  }
+}
+
+.table-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.25rem; }
+
+.data-table { width: 100%; border-collapse: collapse; th { text-align: left; font-size: 0.8rem; color: #64748b; padding: 0.75rem 0.5rem; border-bottom: 1px solid #e2e8f0; } td { padding: 0.85rem 0.5rem; font-size: 0.875rem; border-bottom: 1px solid #f1f5f9; } .client-name { font-weight: 600; color: #0f172a; } .desc-cell { color: #334155; } .date-cell { color: #64748b; font-size: 0.825rem; } }
+
+.badge { padding: 0.25rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; &.high, &.open { background: #fef2f2; color: #dc2626; } &.medium { background: #fffbeb; color: #d97706; } &.in-progress { background: #dbeafe; color: #1d4ed8; } }

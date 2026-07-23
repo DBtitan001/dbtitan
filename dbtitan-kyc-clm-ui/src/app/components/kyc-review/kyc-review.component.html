@@ -1,0 +1,205 @@
+<div class="layout-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="shield-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <span>KYC CLM</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item"><i class="icon">📊</i> Dashboard</a>
+      <a routerLink="/clients" routerLinkActive="active" class="nav-item"><i class="icon">👥</i> Clients</a>
+      <a routerLink="/onboarding" routerLinkActive="active" class="nav-item"><i class="icon">🔄</i> Onboarding</a>
+      <a routerLink="/kyc-review" routerLinkActive="active" class="nav-item"><i class="icon">🛡️</i> KYC Review</a>
+      <a routerLink="/alerts" routerLinkActive="active" class="nav-item"><i class="icon">🔔</i> Alerts</a>
+      <a routerLink="/tasks" routerLinkActive="active" class="nav-item"><i class="icon">📋</i> Tasks</a>
+      <a routerLink="/documents" routerLinkActive="active" class="nav-item"><i class="icon">📁</i> Documents</a>
+      <a routerLink="/reports" routerLinkActive="active" class="nav-item"><i class="icon">📈</i> Reports</a>
+      <a routerLink="/audit-trail" routerLinkActive="active" class="nav-item"><i class="icon">📄</i> Audit Trail</a>
+      <a routerLink="/offboarding" routerLinkActive="active" class="nav-item"><i class="icon">🚪</i> Offboarding</a>
+      <a routerLink="/settings" routerLinkActive="active" class="nav-item"><i class="icon">⚙️</i> Settings</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-container">
+
+      <div class="header-title-bar">
+        <h2>KYC Review</h2>
+        <p class="breadcrumbs">
+          <a routerLink="/dashboard">Home</a> / <a routerLink="/kyc-review">KYC Review</a> / Review Details
+        </p>
+      </div>
+
+      <div class="alert-success" *ngIf="actionSuccessMessage">
+        ✓ {{ actionSuccessMessage }}
+      </div>
+
+      <div class="client-info-card">
+        <div class="info-item">
+          <label>Client Name</label>
+          <strong>{{ client.name }}</strong>
+        </div>
+        <div class="info-item">
+          <label>Client ID</label>
+          <strong>{{ client.id }}</strong>
+        </div>
+        <div class="info-item">
+          <label>Client Type</label>
+          <strong>{{ client.type }}</strong>
+        </div>
+        <div class="info-item">
+          <label>Risk Rating</label>
+          <span class="badge risk high">{{ client.riskRating }}</span>
+        </div>
+      </div>
+
+      <div class="tabs-card">
+        <div class="tab-header">
+          <button class="tab-btn" [class.active]="activeTab === 'documents'" (click)="setTab('documents')">Documents</button>
+          <button class="tab-btn" [class.active]="activeTab === 'risk'" (click)="setTab('risk')">Risk Assessment</button>
+          <button class="tab-btn" [class.active]="activeTab === 'pep'" (click)="setTab('pep')">PEP & Sanctions</button>
+          <button class="tab-btn" [class.active]="activeTab === 'history'" (click)="setTab('history')">Review History</button>
+        </div>
+
+        <div class="tab-content" *ngIf="activeTab === 'documents'">
+          <table class="data-table">
+            <thead>
+            <tr>
+              <th>Document Name</th>
+              <th>Document Type</th>
+              <th>Uploaded On</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let doc of documents">
+              <td><strong>{{ doc.name }}</strong></td>
+              <td>{{ doc.type }}</td>
+              <td>{{ doc.uploadedOn }}</td>
+              <td>
+                <span class="badge" [ngClass]="doc.status.toLowerCase()">{{ doc.status }}</span>
+              </td>
+              <td>
+                <button class="btn-action" (click)="viewDocument(doc)">👁 View</button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tab-content" *ngIf="activeTab === 'risk'">
+          <div class="risk-details-grid">
+            <div class="risk-card">
+              <label>Geographic Risk</label>
+              <p>{{ riskScores.geographicRisk }}</p>
+            </div>
+            <div class="risk-card">
+              <label>Industry Risk</label>
+              <p>{{ riskScores.industryRisk }}</p>
+            </div>
+            <div class="risk-card">
+              <label>Corporate Structure Risk</label>
+              <p>{{ riskScores.structureRisk }}</p>
+            </div>
+            <div class="risk-card highlight">
+              <label>Calculated Risk Score</label>
+              <h3>{{ riskScores.overallScore }} / 100</h3>
+              <span class="badge risk high">{{ riskScores.calculatedRating }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" *ngIf="activeTab === 'pep'">
+          <div class="pep-screening-container">
+            <div class="screening-row">
+              <span>Politically Exposed Person (PEP) Match:</span>
+              <span class="badge" [class.green]="!pepSanctions.pepMatch" [class.red]="pepSanctions.pepMatch">
+                {{ pepSanctions.pepMatch ? 'MATCH FOUND' : 'NO MATCH' }}
+              </span>
+            </div>
+            <div class="screening-row">
+              <span>Global Sanctions List Match:</span>
+              <span class="badge" [class.green]="!pepSanctions.sanctionMatch" [class.red]="pepSanctions.sanctionMatch">
+                {{ pepSanctions.sanctionMatch ? 'MATCH FOUND' : 'NO MATCH' }}
+              </span>
+            </div>
+            <div class="screening-row">
+              <span>Adverse Media Screening:</span>
+              <span class="badge yellow">RECORD FOUND</span>
+            </div>
+            <div class="screening-remarks">
+              <label>Screening Remarks:</label>
+              <p>{{ pepSanctions.details }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" *ngIf="activeTab === 'history'">
+          <div class="history-timeline">
+            <div class="timeline-item" *ngFor="let h of reviewHistory">
+              <div class="timeline-header">
+                <strong>{{ h.action }}</strong>
+                <small>{{ h.date }}</small>
+              </div>
+              <p class="timeline-user">By: {{ h.reviewer }}</p>
+              <p class="timeline-comment">{{ h.comments }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-footer-row">
+        <button class="btn-danger" (click)="openActionModal('Reject')">✖ Reject</button>
+        <button class="btn-secondary" (click)="openActionModal('Request Info')">✉ Request More Info</button>
+        <button class="btn-success" (click)="openActionModal('Approve')">✓ Approve</button>
+      </div>
+
+    </div>
+  </main>
+
+  <div class="modal-backdrop" *ngIf="isViewDocModalOpen" (click)="closeViewDocModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📄 {{ selectedDoc?.name }}</h3>
+        <button class="close-btn" (click)="closeViewDocModal()">✕</button>
+      </div>
+      <div class="modal-body" *ngIf="selectedDoc">
+        <p><strong>Document Type:</strong> {{ selectedDoc.type }}</p>
+        <p><strong>Uploaded On:</strong> {{ selectedDoc.uploadedOn }}</p>
+        <p><strong>Verification Status:</strong> {{ selectedDoc.status }}</p>
+        <div class="preview-box">
+          <p>📜 [ Document Preview Area for {{ selectedDoc.name }} ]</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeViewDocModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="isActionModalOpen" (click)="closeActionModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Confirm Action: {{ actionType }}</h3>
+        <button class="close-btn" (click)="closeActionModal()">✕</button>
+      </div>
+      <form [formGroup]="actionForm" (ngSubmit)="submitDecision()">
+        <div class="form-group">
+          <label>Reviewer Remarks / Justification</label>
+          <textarea formControlName="remarks" rows="3" placeholder="Provide reason or notes for this decision..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeActionModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="actionForm.invalid">Submit Decision</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,176 @@
+<div class="layout-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="shield-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <span>KYC CLM</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item"><i class="icon">📊</i> Dashboard</a>
+      <a routerLink="/clients" routerLinkActive="active" class="nav-item"><i class="icon">👥</i> Clients</a>
+      <a routerLink="/onboarding" routerLinkActive="active" class="nav-item"><i class="icon">🔄</i> Onboarding</a>
+      <a routerLink="/kyc-review" routerLinkActive="active" class="nav-item"><i class="icon">🛡️</i> KYC Review</a>
+      <a routerLink="/alerts" routerLinkActive="active" class="nav-item"><i class="icon">🔔</i> Alerts</a>
+      <a routerLink="/tasks" routerLinkActive="active" class="nav-item"><i class="icon">📋</i> Tasks</a>
+      <a routerLink="/documents" routerLinkActive="active" class="nav-item"><i class="icon">📁</i> Documents</a>
+      <a routerLink="/reports" routerLinkActive="active" class="nav-item"><i class="icon">📈</i> Reports</a>
+      <a routerLink="/audit-trail" routerLinkActive="active" class="nav-item"><i class="icon">📄</i> Audit Trail</a>
+      <a routerLink="/offboarding" routerLinkActive="active" class="nav-item"><i class="icon">🚪</i> Offboarding</a>
+      <a routerLink="/settings" routerLinkActive="active" class="nav-item"><i class="icon">⚙️</i> Settings</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="top-header">
+      <div class="header-left">
+        <span class="menu-toggle">☰</span>
+        <h1>Audit Trail Logs</h1>
+      </div>
+
+      <div class="header-right">
+        <button class="ai-voice-btn" [class.is-listening]="voiceService.isListening" (click)="voiceService.startListening()" title="Ask AI">
+          <svg *ngIf="!voiceService.isListening" class="mic-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+        </button>
+
+        <div class="user-profile" (click)="logout()" title="Click to logout">
+          <div class="avatar">
+            <img src="https://ui-avatars.com/api/?name={{currentUser}}&background=2563eb&color=fff" alt="User">
+          </div>
+          <span class="username">{{ currentUser }} ▾</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard-body">
+
+      <div class="header-action-row">
+        <h2>Activity & Security Logs</h2>
+        <button class="btn-primary" (click)="exportLogs()">📥 Export Audit Logs (.CSV)</button>
+      </div>
+
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <span class="title">Total System Events</span>
+          <div class="value">{{ auditLogs.length }}</div>
+          <span class="subtext blue">Tracked across platform</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="title">Successful Actions</span>
+          <div class="value">3</div>
+          <span class="subtext green">✓ Compliance Verified</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="title">Security Warnings</span>
+          <div class="value">1</div>
+          <span class="subtext yellow">◆ Parameter Change</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="title">Failed Attempts</span>
+          <div class="value">1</div>
+          <span class="subtext red">🛑 Auth Failure</span>
+        </div>
+      </section>
+
+      <section class="panel-card">
+        <div class="filter-bar">
+          <input type="text" [(ngModel)]="searchQuery" placeholder="Search user, action, or log ID..." class="search-input" />
+
+          <div class="dropdown-group">
+            <select [(ngModel)]="selectedModule" class="filter-select">
+              <option value="All">All Modules</option>
+              <option value="Client Management">Client Management</option>
+              <option value="KYC Review">KYC Review</option>
+              <option value="Document Repository">Document Repository</option>
+              <option value="User Access">User Access</option>
+              <option value="System">System</option>
+            </select>
+
+            <select [(ngModel)]="selectedStatus" class="filter-select">
+              <option value="All">All Statuses</option>
+              <option value="Success">Success</option>
+              <option value="Warning">Warning</option>
+              <option value="Failed">Failed</option>
+            </select>
+          </div>
+        </div>
+
+        <table class="activities-table">
+          <thead>
+          <tr>
+            <th>Log ID</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Module</th>
+            <th>IP Address</th>
+            <th>Date & Time</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let log of filteredLogs">
+            <td><strong>{{ log.id }}</strong></td>
+            <td>{{ log.user }}</td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.module }}</td>
+            <td class="date-cell">{{ log.ipAddress }}</td>
+            <td class="date-cell">{{ log.dateTime }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="log.status.toLowerCase()">{{ log.status }}</span>
+            </td>
+            <td>
+              <button class="btn-action" (click)="viewLogDetails(log)">👁 View</button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredLogs.length === 0">
+            <td colspan="8" style="text-align: center; color: #64748b; padding: 2rem 0;">No logs found matching your filters.</td>
+          </tr>
+          </tbody>
+        </table>
+      </section>
+
+    </div>
+  </main>
+
+  <div class="modal-backdrop" *ngIf="isDetailModalOpen" (click)="closeDetailModal()">
+    <div class="modal-card detail-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>🔍 Audit Event Details</h3>
+        <button class="close-btn" (click)="closeDetailModal()">✕</button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedLog">
+        <div class="detail-grid">
+          <div><strong>Log ID:</strong> <span>{{ selectedLog.id }}</span></div>
+          <div><strong>User:</strong> <span>{{ selectedLog.user }}</span></div>
+          <div><strong>Action:</strong> <span>{{ selectedLog.action }}</span></div>
+          <div><strong>Module:</strong> <span>{{ selectedLog.module }}</span></div>
+          <div><strong>IP Address:</strong> <span>{{ selectedLog.ipAddress }}</span></div>
+          <div><strong>Date & Time:</strong> <span>{{ selectedLog.dateTime }}</span></div>
+          <div><strong>Status:</strong> <span class="status-badge" [ngClass]="selectedLog.status.toLowerCase()">{{ selectedLog.status }}</span></div>
+        </div>
+
+        <div class="details-box">
+          <label>Event Description & Parameters:</label>
+          <p>{{ selectedLog.details }}</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeDetailModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+</div>
