@@ -1,5 +1,6 @@
-<div class="layout-wrapper">
-  <aside class="sidebar">
+<div class="layout-wrapper" (click)="closeAllMenus()">
+
+  <aside class="sidebar" (click)="$event.stopPropagation()">
     <div class="sidebar-brand">
       <div class="shield-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -15,88 +16,138 @@
       <a routerLink="/onboarding" routerLinkActive="active" class="nav-item"><i class="icon">🔄</i> Onboarding</a>
       <a routerLink="/kyc-review" routerLinkActive="active" class="nav-item"><i class="icon">🛡️</i> KYC Review</a>
       <a routerLink="/alerts" routerLinkActive="active" class="nav-item"><i class="icon">🔔</i> Alerts</a>
-      <a class="nav-item"><i class="icon">📋</i> Tasks</a>
-      <a class="nav-item"><i class="icon">📁</i> Documents</a>
-      <a class="nav-item"><i class="icon">📈</i> Reports</a>
-      <a class="nav-item"><i class="icon">📄</i> Audit Trail</a>
-      <a class="nav-item"><i class="icon">🚪</i> Offboarding</a>
-      <a class="nav-item"><i class="icon">⚙️</i> Settings</a>
+      <a routerLink="/tasks" routerLinkActive="active" class="nav-item"><i class="icon">📋</i> Tasks</a>
+      <a routerLink="/documents" routerLinkActive="active" class="nav-item"><i class="icon">📁</i> Documents</a>
+      <a routerLink="/reports" routerLinkActive="active" class="nav-item"><i class="icon">📈</i> Reports</a>
+      <a routerLink="/audit-trail" routerLinkActive="active" class="nav-item"><i class="icon">📄</i> Audit Trail</a>
+      <a routerLink="/offboarding" routerLinkActive="active" class="nav-item"><i class="icon">🚪</i> Offboarding</a>
+      <a routerLink="/settings" routerLinkActive="active" class="nav-item"><i class="icon">⚙️</i> Settings</a>
     </nav>
   </aside>
 
   <main class="main-content">
-    <div class="page-container">
-      <h2>Onboarding</h2>
-      <p class="breadcrumbs">
-        <a routerLink="/dashboard" class="home-link">Home</a> / Onboarding / New Client
-      </p>
 
-      <div class="stepper">
-        <div class="step" [class.active]="currentStep >= 1">
-          <div class="circle">1</div>
-          <span>Basic Information</span>
-        </div>
-        <div class="step" [class.active]="currentStep >= 2">
-          <div class="circle">2</div>
-          <span>Contact Details</span>
-        </div>
-        <div class="step" [class.active]="currentStep >= 3">
-          <div class="circle">3</div>
-          <span>Business Details</span>
-        </div>
-        <div class="step" [class.active]="currentStep >= 4">
-          <div class="circle">4</div>
-          <span>Documents</span>
-        </div>
-        <div class="step" [class.active]="currentStep >= 5">
-          <div class="circle">5</div>
-          <span>Review & Submit</span>
-        </div>
+    <header class="top-header" (click)="$event.stopPropagation()">
+      <div class="header-left">
+        <span class="menu-toggle">☰</span>
+        <h1>Client Onboarding</h1>
       </div>
 
-      <div class="form-card" [formGroup]="onboardingForm">
-        <h3>Basic Information</h3>
+      <div class="header-right">
+        <button class="ai-voice-btn" [class.is-listening]="voiceService.isListening" (click)="voiceService.startListening()" title="Ask AI">
+          <svg *ngIf="!voiceService.isListening" class="mic-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+        </button>
 
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Client Type</label>
-            <select formControlName="clientType">
-              <option value="Corporate">Corporate</option>
-              <option value="Individual">Individual</option>
-            </select>
+        <div class="user-profile-wrapper">
+          <div class="user-profile" (click)="toggleProfileMenu($event)">
+            <div class="avatar">
+              <img src="https://ui-avatars.com/api/?name={{currentUser}}&background=2563eb&color=fff" alt="User">
+            </div>
+            <span class="username">{{ currentUser }} ▾</span>
           </div>
 
-          <div class="form-group">
-            <label>Client Name</label>
-            <input type="text" formControlName="clientName" placeholder="Enter Client Name" />
+          <div class="dropdown-popover profile-popover" *ngIf="isProfileMenuOpen" (click)="$event.stopPropagation()">
+            <div class="profile-info">
+              <strong>{{ currentUser }}</strong>
+              <small>System Administrator</small>
+            </div>
+            <hr />
+            <a routerLink="/settings" (click)="closeAllMenus()" class="popover-link">⚙️ Settings</a>
+            <a (click)="logout($event)" class="popover-link danger">🚪 Logout</a>
           </div>
-
-          <div class="form-group">
-            <label>Date of Incorporation</label>
-            <input type="date" formControlName="dateOfIncorporation" />
-          </div>
-
-          <div class="form-group">
-            <label>Country of Incorporation</label>
-            <input type="text" formControlName="countryOfIncorporation" placeholder="Select Country" />
-          </div>
-
-          <div class="form-group">
-            <label>Registration Number</label>
-            <input type="text" formControlName="registrationNumber" placeholder="Enter Registration Number" />
-          </div>
-
-          <div class="form-group">
-            <label>PAN / Tax ID</label>
-            <input type="text" formControlName="panTaxId" placeholder="Enter PAN / Tax ID" />
-          </div>
-        </div>
-
-        <div class="button-row">
-          <button class="btn-secondary" routerLink="/dashboard">Cancel</button>
-          <button class="btn-primary" (click)="nextStep()">Next</button>
         </div>
       </div>
+    </header>
+
+    <div class="dashboard-body">
+
+      <div class="header-action-row">
+        <h2>Onboarding Pipeline</h2>
+        <button class="btn-primary" (click)="openNewCaseModal()">➕ Initiate Onboarding</button>
+      </div>
+
+      <section class="panel-card">
+        <div class="filter-bar">
+          <input type="text" [(ngModel)]="searchQuery" placeholder="Search by Client Name or Case ID..." class="search-input" />
+
+          <select [(ngModel)]="selectedStage" class="filter-select">
+            <option value="All">All Stages</option>
+            <option value="Document Collection">Document Collection</option>
+            <option value="KYC Screening">KYC Screening</option>
+            <option value="Risk Rating">Risk Rating</option>
+            <option value="Final Approval">Final Approval</option>
+          </select>
+        </div>
+
+        <table class="activities-table">
+          <thead>
+          <tr>
+            <th>Case ID</th>
+            <th>Client Name</th>
+            <th>Client Type</th>
+            <th>Current Stage</th>
+            <th>Assigned To</th>
+            <th>Start Date</th>
+            <th>Status</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let caseItem of filteredCases">
+            <td><strong>{{ caseItem.id }}</strong></td>
+            <td>{{ caseItem.clientName }}</td>
+            <td>{{ caseItem.clientType }}</td>
+            <td>{{ caseItem.stage }}</td>
+            <td>{{ caseItem.assignedTo }}</td>
+            <td class="date-cell">{{ caseItem.startDate }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="caseItem.status.toLowerCase().replace(' ', '-')">{{ caseItem.status }}</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </section>
+
     </div>
   </main>
+
+  <div class="modal-backdrop" *ngIf="isNewCaseModalOpen" (click)="closeNewCaseModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Initiate New Client Onboarding</h3>
+        <button class="close-btn" (click)="closeNewCaseModal()">✕</button>
+      </div>
+
+      <form [formGroup]="onboardForm" (ngSubmit)="onCaseSubmit()">
+        <div class="form-group">
+          <label>Client Name</label>
+          <input type="text" formControlName="clientName" placeholder="e.g. Acme Corp" />
+        </div>
+
+        <div class="form-group">
+          <label>Client Type</label>
+          <select formControlName="clientType">
+            <option value="Corporate">Corporate</option>
+            <option value="Individual">Individual</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Assign Officer</label>
+          <select formControlName="assignedTo">
+            <option value="John Analyst">John Analyst</option>
+            <option value="Compliance Officer">Compliance Officer</option>
+            <option value="Risk Manager">Risk Manager</option>
+          </select>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeNewCaseModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="onboardForm.invalid">Start Onboarding</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </div>
