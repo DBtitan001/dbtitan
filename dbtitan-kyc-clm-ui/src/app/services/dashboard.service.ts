@@ -17,7 +17,7 @@ export interface DashboardAnalytics {
   providedIn: 'root'
 })
 export class DashboardService {
-  private apiUrl = 'http://localhost:8080/api/dashboard/analytics';
+  private apiUrl = 'https://dbtitan-backend-406358130353.asia-south1.run.app/api/dashboard/analytics';
 
   constructor(private http: HttpClient) {}
 

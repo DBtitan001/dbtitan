@@ -28,7 +28,7 @@ export class SignupComponent {
       this.isLoading = true;
       this.errorMessage = '';
 
-      this.http.post('http://localhost:8080/api/auth/signup', this.signupForm.value)
+      this.http.post('https://dbtitan-backend-406358130353.asia-south1.run.app/api/auth/signup', this.signupForm.value)
         .subscribe({
           next: () => {
             this.isLoading = false;

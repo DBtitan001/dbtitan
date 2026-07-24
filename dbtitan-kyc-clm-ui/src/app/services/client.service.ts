@@ -16,7 +16,7 @@ export interface Client {
   providedIn: 'root'
 })
 export class ClientService {
-  private apiUrl = 'http://localhost:8080/api/clients';
+  private apiUrl = 'https://dbtitan-backend-406358130353.asia-south1.run.app/api/clients';
 
   constructor(private http: HttpClient) {}
 

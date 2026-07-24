@@ -7,7 +7,7 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/auth'; // Replace with your API URL
+  private apiUrl = 'https://dbtitan-backend-406358130353.asia-south1.run.app/api/auth'; // Replace with your API URL
   private tokenKey = 'auth_token';
   private isBrowser: boolean;
 

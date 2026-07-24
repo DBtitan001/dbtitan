@@ -25,6 +25,7 @@ export class ClientsComponent implements OnInit {
   isLoading: boolean = true;
   isAddModalOpen: boolean = false;
 
+  private apiUrl = 'https://dbtitan-backend-406358130353.asia-south1.run.app/api/clients';
   // Reactive Form for Add Client Modal
   clientForm = new FormGroup({
     clientName: new FormControl('', Validators.required),
