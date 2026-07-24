@@ -11,6 +11,7 @@ import { ReportsComponent } from './components/reports/reports.component';
 import { AuditTrailComponent } from './components/audit-trail/audit-trail.component';
 import { OffboardingComponent } from './components/offboarding/offboarding.component';
 import { SettingsComponent } from './components/settings/settings.component';
+import { TasksComponent } from './components/tasks/tasks.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -21,6 +22,7 @@ export const routes: Routes = [
   { path: 'onboarding', component: OnboardingComponent },
   { path: 'kyc-review', component: KycReviewComponent },
   { path: 'alerts', component: AlertsComponent },
+  { path: 'tasks', component: TasksComponent },
   { path: 'documents', component: DocumentsComponent },
   { path: 'reports', component: ReportsComponent },
   { path: 'audit-trail', component: AuditTrailComponent },

@@ -56,7 +56,7 @@
             <a routerLink="/dashboard" class="home-link">Home</a> / Clients
           </p>
         </div>
-        <button class="btn-primary" routerLink="/onboarding">+ Add Client</button>
+        <button class="btn-primary" (click)="openAddModal()">+ Add Client</button>
       </div>
 
       <div class="table-card">
@@ -102,4 +102,52 @@
       </div>
     </div>
   </main>
+
+  <div class="modal-backdrop" *ngIf="isAddModalOpen" (click)="closeAddModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Add New Client</h3>
+        <button class="close-btn" (click)="closeAddModal()">✕</button>
+      </div>
+
+      <form [formGroup]="clientForm" (ngSubmit)="onAddClientSubmit()">
+        <div class="form-group">
+          <label>Client Name</label>
+          <input type="text" formControlName="clientName" placeholder="e.g. Acme Corporation" required />
+        </div>
+
+        <div class="form-group">
+          <label>Client Type</label>
+          <select formControlName="clientType">
+            <option value="Corporate">Corporate</option>
+            <option value="Individual">Individual</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Risk Rating</label>
+          <select formControlName="riskRating">
+            <option value="Low">Low Risk</option>
+            <option value="Medium">Medium Risk</option>
+            <option value="High">High Risk</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Initial Status</label>
+          <select formControlName="status">
+            <option value="Onboarding">Onboarding</option>
+            <option value="KYC Review">KYC Review</option>
+            <option value="Active">Active</option>
+          </select>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeAddModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="clientForm.invalid">Save Client</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </div>
