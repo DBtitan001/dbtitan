@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,64 +26,139 @@ public class AiAssistantController {
 
     @PostMapping("/ask")
     public ResponseEntity<Map<String, String>> askAi(@RequestBody AiQueryRequest request) {
-        String query = request.getQuery() != null ? request.getQuery().trim().toLowerCase() : "";
-        String reply;
+        String rawText = request.getPrompt() != null ? request.getPrompt() : request.getQuery();
+        String query = rawText != null ? rawText.trim().toLowerCase() : "";
+        String context = request.getContext() != null ? request.getContext().trim().toLowerCase() : "";
 
-        // Fetch current live data from PostgreSQL
+        System.out.println("AI Assistant Query: '" + query + "' | Context: '" + context + "'");
+
         List<DocumentEntity> allDocs = documentRepository.findAll();
         List<ClientEntity> allClients = clientRepository.findAll();
 
-        // Check if query mentions any known client name in the DB (e.g. Airtel, ABC Corporation, John Doe)
-        Optional<ClientEntity> matchedClient = allClients.stream()
-                .filter(c -> c.getClientName() != null && query.contains(c.getClientName().toLowerCase()))
-                .findFirst();
+        String reply;
 
-        // 1. QUERY FOR SPECIFIC CLIENT DETAILS/DOCUMENTS
-        if (matchedClient.isPresent()) {
-            ClientEntity client = matchedClient.get();
-            List<DocumentEntity> clientDocs = allDocs.stream()
-                    .filter(d -> d.getClient() != null && client.getClientId().equalsIgnoreCase(d.getClient().getClientId()))
-                    .collect(Collectors.toList());
+        // -------------------------------------------------------------
+        // 1. REPORTS SCREEN CONTEXT
+        // -------------------------------------------------------------
+        if ("reports".equalsIgnoreCase(context) || query.contains("report")) {
 
-            if (!clientDocs.isEmpty()) {
-                String docDetails = clientDocs.stream()
-                        .map(d -> d.getDocumentName() + " (" + d.getStatus() + ")")
-                        .collect(Collectors.joining(", "));
-                reply = "Client " + client.getClientName() + " (ID: " + client.getClientId() + ") has " +
-                        clientDocs.size() + " document(s) uploaded: " + docDetails + ".";
+            // A. Check if asking about RISK / RISK ASSESSMENT
+            if (query.contains("risk") || query.contains("assessment") || query.contains("management")) {
+                long highRiskCount = allClients.stream()
+                        .filter(c -> "High".equalsIgnoreCase(c.getRiskRating()))
+                        .count();
+                reply = "Filtering Reports for Risk Assessment. You currently have " + highRiskCount +
+                        " high-risk client(s) flagged in the database requiring priority analysis.";
+
+                // B. Check if asking about COMPLIANCE
+            } else if (query.contains("compliance")) {
+                reply = "Filtering Reports for Compliance. Showing all audit-ready compliance overview reports.";
+
+                // C. Check if asking about AUDIT
+            } else if (query.contains("audit")) {
+                reply = "Filtering Reports for Audit Trail. Accessing system activity and change history logs.";
+
+                // D. Check if asking about ONBOARDING
+            } else if (query.contains("onboarding")) {
+                long onboardingClients = allClients.stream()
+                        .filter(c -> "Pending".equalsIgnoreCase(c.getStatus()) || "In Progress".equalsIgnoreCase(c.getStatus()))
+                        .count();
+                reply = "Filtering Reports for Client Onboarding. There are " + onboardingClients +
+                        " client(s) currently undergoing onboarding review.";
+
+                // E. Check if query mentions a SPECIFIC CLIENT
             } else {
-                reply = "Client " + client.getClientName() + " is registered with status " + client.getStatus() +
-                        ", but has no uploaded documents yet.";
+                Optional<ClientEntity> matchedClient = findClientInQuery(allClients, query);
+                if (matchedClient.isPresent()) {
+                    ClientEntity client = matchedClient.get();
+                    List<DocumentEntity> clientDocs = allDocs.stream()
+                            .filter(d -> d.getClient() != null && client.getClientId().equalsIgnoreCase(d.getClient().getClientId()))
+                            .collect(Collectors.toList());
+
+                    reply = "Client Report for " + client.getClientName() + " (ID: " + client.getClientId() + "): " +
+                            "Risk rating is " + client.getRiskRating() + " with " + clientDocs.size() + " attached document(s).";
+                } else {
+                    reply = "Report Analytics: Displaying reports repository for " + allClients.size() +
+                            " clients and " + allDocs.size() + " registered documents.";
+                }
             }
 
-            // 2. GENERAL DOCUMENT QUERY
-        } else if (query.contains("document") || query.contains("file") || query.contains("passport") || query.contains("proof")) {
-            long total = allDocs.size();
-            long pending = allDocs.stream().filter(d -> "Pending".equalsIgnoreCase(d.getStatus())).count();
-            long verified = allDocs.stream().filter(d -> "Verified".equalsIgnoreCase(d.getStatus()) || "Active".equalsIgnoreCase(d.getStatus())).count();
+            // -------------------------------------------------------------
+            // 2. DOCUMENTS SCREEN CONTEXT
+            // -------------------------------------------------------------
+        } else if ("documents".equalsIgnoreCase(context) || query.contains("document") || query.contains("file")) {
 
-            reply = "There are currently " + total + " total documents in the database. " +
-                    verified + " are verified or active, and " + pending + " are pending review.";
+            Optional<ClientEntity> matchedClient = findClientInQuery(allClients, query);
+            if (matchedClient.isPresent()) {
+                ClientEntity client = matchedClient.get();
+                List<DocumentEntity> clientDocs = allDocs.stream()
+                        .filter(d -> d.getClient() != null && client.getClientId().equalsIgnoreCase(d.getClient().getClientId()))
+                        .collect(Collectors.toList());
 
-            // 3. GENERAL CLIENT QUERY
-        } else if (query.contains("client") || query.contains("company") || query.contains("customer")) {
-            long totalClients = allClients.size();
-            long highRisk = allClients.stream().filter(c -> "High".equalsIgnoreCase(c.getRiskRating())).count();
+                if (!clientDocs.isEmpty()) {
+                    String docNames = clientDocs.stream()
+                            .map(DocumentEntity::getDocumentName)
+                            .collect(Collectors.joining(", "));
+                    reply = "Client " + client.getClientName() + " has " + clientDocs.size() +
+                            " document(s) uploaded in repository: " + docNames + ".";
+                } else {
+                    reply = "Client " + client.getClientName() + " is registered, but has 0 uploaded documents.";
+                }
+            } else {
+                long total = allDocs.size();
+                long verified = allDocs.stream().filter(d -> "Verified".equalsIgnoreCase(d.getStatus()) || "Active".equalsIgnoreCase(d.getStatus())).count();
+                long pending = allDocs.stream().filter(d -> "Pending".equalsIgnoreCase(d.getStatus())).count();
 
-            reply = "You currently have " + totalClients + " clients onboarded in the system, with " +
-                    highRisk + " rated as high risk.";
+                reply = "Document Repository: " + total + " total documents stored. " +
+                        verified + " verified active and " + pending + " pending review.";
+            }
 
-            // 4. FALLBACK GENERAL SUMMARY
+            // -------------------------------------------------------------
+            // 3. DEFAULT DASHBOARD / GENERAL SUMMARY
+            // -------------------------------------------------------------
         } else {
-            reply = "I checked the database. You currently have " + allClients.size() + " clients and " +
-                    allDocs.size() + " documents stored in the system.";
+            Optional<ClientEntity> matchedClient = findClientInQuery(allClients, query);
+            if (matchedClient.isPresent()) {
+                ClientEntity client = matchedClient.get();
+                reply = "Client Summary for " + client.getClientName() + ": Status is " + client.getStatus() +
+                        " and Risk Rating is " + client.getRiskRating() + ".";
+            } else {
+                reply = "System Summary: You currently have " + allClients.size() + " clients and " +
+                        allDocs.size() + " documents stored in database.";
+            }
         }
 
-        return ResponseEntity.ok(Map.of("summary", reply));
+        return ResponseEntity.ok(Map.of(
+                "response", reply,
+                "summary", reply
+        ));
+    }
+
+    /**
+     * Helper to search for client names in query string
+     */
+    private Optional<ClientEntity> findClientInQuery(List<ClientEntity> clients, String query) {
+        return clients.stream().filter(c -> {
+            if (c.getClientName() == null) return false;
+            String cName = c.getClientName().toLowerCase();
+            String cId = c.getClientId() != null ? c.getClientId().toLowerCase() : "";
+
+            if (query.contains(cName) || (!cId.isEmpty() && query.contains(cId))) {
+                return true;
+            }
+
+            List<String> nameTokens = Arrays.stream(cName.split("\\s+"))
+                    .filter(word -> word.length() > 2 && !word.equals("corporation") && !word.equals("pvt") && !word.equals("ltd") && !word.equals("inc"))
+                    .collect(Collectors.toList());
+
+            return nameTokens.stream().anyMatch(query::contains);
+        }).findFirst();
     }
 
     @Data
     public static class AiQueryRequest {
         private String query;
+        private String prompt;
+        private String context;
     }
 }

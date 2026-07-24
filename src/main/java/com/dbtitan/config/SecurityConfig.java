@@ -55,6 +55,8 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/api/ai/**").permitAll()
                         .requestMatchers("/api/ai/**").permitAll()
+                        .requestMatchers("/api/reports/**").permitAll()
+
                         .requestMatchers("/api/auth/**", "/api/ai/**", "/api/dashboard/**").permitAll()
 
                         // Require authentication for all other endpoints

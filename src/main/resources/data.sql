@@ -34,3 +34,13 @@ VALUES
     ('C0007', 'Michael Brown', 'Individual', 'Low', 'Active', '18 May 2026', NOW()),
     ('C0008', 'Alpha Ventures', 'Corporate', 'High', 'KYC Review', '19 May 2026', NOW())
     ON CONFLICT (client_id) DO NOTHING;
+
+
+INSERT INTO reports (report_id, title, category, generated_date, generated_by, format, status, client_id, created_at)
+VALUES
+    ('RPT-001', 'Monthly KYC Compliance Overview', 'Compliance', '20 May 2026', 'System Admin', 'PDF', 'Ready', NULL, NOW()),
+    ('RPT-002', 'High-Risk Client Summary', 'Risk Assessment', '18 May 2026', 'Risk Manager', 'Excel', 'Ready', NULL, NOW()),
+    ('RPT-003', 'Onboarding Turnaround Time (TAT)', 'Client Onboarding', '15 May 2026', 'Operations Lead', 'PDF', 'Ready', NULL, NOW()),
+    ('RPT-004', 'Q1 Audit Trail & Exception Log', 'Audit', '10 May 2026', 'Internal Auditor', 'CSV', 'Ready', NULL, NOW()),
+    ('RPT-005', 'Expired Documents Audit', 'Compliance', '05 May 2026', 'Compliance Officer', 'PDF', 'Ready', NULL, NOW())
+    ON CONFLICT (report_id) DO NOTHING;

@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { AiVoiceService } from '../../services/ai-voice.service';
 import { DashboardService, DashboardAnalytics } from '../../services/dashboard.service';
 
@@ -20,7 +21,7 @@ interface RecentActivity {
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   currentUser = 'Admin User';
 
   // Top Bar Dropdown States
@@ -51,6 +52,8 @@ export class DashboardComponent implements OnInit {
     { activity: 'Global Solutions', type: 'Risk Assessment', status: 'Completed', dateTime: '23 May 2026 08:50 AM' }
   ];
 
+  private voiceSubscription?: Subscription;
+
   constructor(
     private router: Router,
     public voiceService: AiVoiceService,
@@ -65,10 +68,48 @@ export class DashboardComponent implements OnInit {
         if (parsed.username) this.currentUser = parsed.username;
       } catch (e) {}
     }
+
     this.loadDashboardData();
+    this.listenToVoiceCommands();
   }
 
-  loadDashboardData() {
+  ngOnDestroy(): void {
+    if (this.voiceSubscription) {
+      this.voiceSubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * Listens for spoken voice transcripts on the Dashboard
+   */
+  private listenToVoiceCommands(): void {
+    // Set active context to 'dashboard'
+    this.voiceService.setContext('dashboard');
+
+    this.voiceSubscription = this.voiceService.recognizedText$.subscribe((transcript: string) => {
+      if (!transcript) return;
+
+      console.log('Voice Command Received on Dashboard:', transcript);
+      const lowerText = transcript.toLowerCase();
+
+      // Navigation & Dashboard specific action handling
+      if (lowerText.includes('show clients') || lowerText.includes('go to clients')) {
+        this.router.navigate(['/clients']);
+      } else if (lowerText.includes('show reports') || lowerText.includes('open reports')) {
+        this.router.navigate(['/reports']);
+      } else if (lowerText.includes('show documents') || lowerText.includes('open documents')) {
+        this.router.navigate(['/documents']);
+      } else if (lowerText.includes('search for') || lowerText.includes('find client')) {
+        const query = transcript.replace(/search for|find client|search/gi, '').trim();
+        if (query) {
+          this.topSearchQuery = query;
+          this.onGlobalSearch();
+        }
+      }
+    });
+  }
+
+  loadDashboardData(): void {
     this.dashboardService.getAnalytics().subscribe({
       next: (data: DashboardAnalytics) => {
         this.totalClients = data.totalClients.toLocaleString();
@@ -80,37 +121,37 @@ export class DashboardComponent implements OnInit {
         this.kycOverdue = data.kycOverdue;
         this.documentExpiry = data.documentExpiry;
       },
-      error: (err) => console.error('Failed to load metrics:', err)
+      error: (err: unknown) => console.error('Failed to load metrics:', err)
     });
   }
 
   // Header Handlers
-  toggleSearch() {
+  toggleSearch(): void {
     this.isSearchOpen = !this.isSearchOpen;
     if (!this.isSearchOpen) this.topSearchQuery = '';
   }
 
-  toggleNotifications() {
+  toggleNotifications(): void {
     this.isNotificationOpen = !this.isNotificationOpen;
     this.isProfileMenuOpen = false;
   }
 
-  toggleProfileMenu() {
+  toggleProfileMenu(): void {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
     this.isNotificationOpen = false;
   }
 
-  onGlobalSearch() {
+  onGlobalSearch(): void {
     if (this.topSearchQuery.trim()) {
       this.router.navigate(['/clients'], { queryParams: { q: this.topSearchQuery } });
     }
   }
 
-  markAllNotificationsRead() {
+  markAllNotificationsRead(): void {
     this.notifications.forEach(n => n.unread = false);
   }
 
-  logout() {
+  logout(): void {
     localStorage.removeItem('user');
     this.router.navigate(['/login']);
   }

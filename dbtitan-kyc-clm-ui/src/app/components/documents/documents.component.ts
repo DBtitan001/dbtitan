@@ -1,11 +1,12 @@
-import { Component, OnInit, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { AiVoiceService } from '../../services/ai-voice.service';
-import { DocumentService, DocumentEntity } from '../../services/document.service';
+import { DocumentService } from '../../services/document.service';
 import { ClientService, Client } from '../../services/client.service';
 
 interface DocumentRecord {
@@ -28,7 +29,7 @@ interface DocumentRecord {
   templateUrl: './documents.component.html',
   styleUrls: ['./documents.component.scss']
 })
-export class DocumentsComponent implements OnInit {
+export class DocumentsComponent implements OnInit, OnDestroy {
   currentUser = 'Admin User';
   searchQuery: string = '';
   selectedCategory: string = 'All';
@@ -48,7 +49,9 @@ export class DocumentsComponent implements OnInit {
   availableClients: Client[] = []; // Registered clients list for upload selector
   isLoading = false;
 
-  // Form updated to control clientId instead of plain string clientName
+  private voiceSubscription?: Subscription;
+
+  // Form controlling clientId instead of plain string clientName
   uploadForm = new FormGroup({
     clientId: new FormControl('', Validators.required),
     docType: new FormControl('Legal Document', Validators.required),
@@ -86,14 +89,100 @@ export class DocumentsComponent implements OnInit {
 
     this.loadDocumentsFromBackend();
     this.loadClientsForDropdown();
+    this.listenToVoiceCommands();
   }
 
-  // Load registered clients list to populate upload dropdown
+  ngOnDestroy(): void {
+    if (this.voiceSubscription) {
+      this.voiceSubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * Listens to speech-to-text transcript with 'documents' context awareness.
+   * Filters UI table locally while delegating verbal AI analysis to Spring Boot.
+   */
+  private listenToVoiceCommands(): void {
+    // 1. Set active context
+    this.voiceService.setContext('documents');
+
+    this.voiceSubscription = this.voiceService.recognizedText$.subscribe((spokenText: string) => {
+      if (!spokenText) return;
+
+      console.log('Voice Command Received in Documents:', spokenText);
+      const lowerText = spokenText.toLowerCase();
+
+      // 2. Delegate spoken response to Spring Boot AI assistant
+      this.voiceService.askAiBackend(spokenText, 'documents');
+
+      // 3. UI Action: Auto-open Upload Modal
+      if (lowerText.includes('upload') || lowerText.includes('add document')) {
+        this.openUploadModal();
+        return;
+      }
+
+      // 4. UI Action: Category Filters
+      if (lowerText.includes('legal')) {
+        this.selectedCategory = 'Legal Document';
+        this.searchQuery = '';
+        return;
+      }
+      if (lowerText.includes('tax')) {
+        this.selectedCategory = 'Tax Document';
+        this.searchQuery = '';
+        return;
+      }
+      if (lowerText.includes('address')) {
+        this.selectedCategory = 'Address Proof';
+        this.searchQuery = '';
+        return;
+      }
+      if (lowerText.includes('financial')) {
+        this.selectedCategory = 'Financial Document';
+        this.searchQuery = '';
+        return;
+      }
+      if (lowerText.includes('identity') || lowerText.includes('passport') || lowerText.includes('pan')) {
+        this.selectedCategory = 'Identity Proof';
+        this.searchQuery = '';
+        return;
+      }
+
+      // 5. Clean conversational filler words & speech artifacts
+      const cleanedInput = lowerText
+        .replace(/\b(please|can you|i want|could you|tell me|give me|show me|display|find|search for|documents|files|file|for|dog|cat)\b/g, '')
+        .trim();
+
+      // 6. Match against Database Client List for UI Filtering
+      const matchedClient = this.availableClients.find(client => {
+        const cName = client.clientName ? client.clientName.toLowerCase() : '';
+        const cId = client.clientId ? client.clientId.toLowerCase() : '';
+        return (cName && lowerText.includes(cName)) ||
+               (cId && lowerText.includes(cId)) ||
+               (cName && cName.split(' ').some(word => word.length > 2 && lowerText.includes(word)));
+      });
+
+      if (matchedClient) {
+        this.searchQuery = matchedClient.clientName;
+        return;
+      }
+
+      // 7. Direct Search Query Filter (only if valid text remains)
+      if (cleanedInput.length > 2) {
+        this.searchQuery = cleanedInput;
+      } else {
+        // Reset filter if only conversational noise was captured
+        this.searchQuery = '';
+      }
+    });
+  }
+
+  // Load registered clients list to populate upload dropdown & match voice queries
   loadClientsForDropdown(): void {
     this.clientService.getAllClients().subscribe({
       next: (clients: Client[]) => {
         this.availableClients = clients;
-        if (clients.length > 0) {
+        if (clients.length > 0 && !this.uploadForm.get('clientId')?.value) {
           this.uploadForm.patchValue({ clientId: clients[0].clientId });
         }
       },
@@ -118,7 +207,7 @@ export class DocumentsComponent implements OnInit {
     });
   }
 
-  // Defensive Mapper: Traverses the nested entity.client object or fallback properties
+  // Defensive Mapper: Traverses nested entity.client object or fallback properties
   private mapEntityToRecord(entity: any): DocumentRecord {
     const clientObj = entity.client || {};
     return {
@@ -250,7 +339,6 @@ export class DocumentsComponent implements OnInit {
       });
     }
   }
-
 
   logout(event?: Event): void {
     if (event) event.stopPropagation();
