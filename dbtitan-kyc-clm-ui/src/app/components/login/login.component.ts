@@ -18,7 +18,7 @@ export class LoginComponent {
   errorMessage = '';
   successMessage = '';
 
-  private readonly API_URL = 'http://localhost:8080/api/auth';
+  private readonly API_URL = 'https://dbtitan-backend-406358130353.asia-south1.run.app/api/auth';
 
   loginForm = new FormGroup({
     username: new FormControl('', Validators.required),

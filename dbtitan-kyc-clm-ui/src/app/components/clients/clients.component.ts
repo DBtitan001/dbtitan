@@ -25,7 +25,7 @@ export class ClientsComponent implements OnInit {
   allClients: Client[] = [];
   isLoading: boolean = true;
 
-  private apiUrl = 'http://localhost:8080/api/clients';
+  private apiUrl = 'https://dbtitan-backend-406358130353.asia-south1.run.app/api/clients';
 
   constructor(private http: HttpClient) {}
 

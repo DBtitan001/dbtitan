@@ -67,11 +67,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of(
-                "http://localhost:4200",
-                "https://*.web.app",
-                "https://*.firebaseapp.com"
-        ));
+        configuration.setAllowedOrigins(List.of(
+        "http://localhost:4200",
+        "https://dbtitan-ui-406358130353.asia-south1.run.app"
+));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

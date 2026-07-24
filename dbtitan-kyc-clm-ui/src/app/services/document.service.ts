@@ -22,7 +22,7 @@ export interface DocumentEntity {
   providedIn: 'root'
 })
 export class DocumentService {
-  private apiUrl = 'http://localhost:8080/api/documents';
+  private apiUrl = 'https://dbtitan-backend-406358130353.asia-south1.run.app/api/documents';
 
   constructor(private http: HttpClient) {}
 
